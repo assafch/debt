@@ -15,12 +15,13 @@ export async function createUser(data: {
   role: Role;
   password: string;
 }) {
-  const existing = await prisma.user.findUnique({ where: { email: data.email } });
+  const normalizedEmail = data.email.trim().toLowerCase();
+  const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
   if (existing) throw new Error('Email already in use');
 
   const passwordHash = await bcrypt.hash(data.password, 12);
   const user = await prisma.user.create({
-    data: { email: data.email, fullName: data.fullName, role: data.role, passwordHash },
+    data: { email: normalizedEmail, fullName: data.fullName, role: data.role, passwordHash },
     select: { id: true, email: true, fullName: true, role: true, isActive: true, createdAt: true },
   });
   return user;
