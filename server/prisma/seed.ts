@@ -7,7 +7,7 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = process.env.SEED_ADMIN_EMAIL || 'admin@company.com';
+  const email = (process.env.SEED_ADMIN_EMAIL || 'admin@company.com').trim().toLowerCase();
   const password = process.env.SEED_ADMIN_PASSWORD || 'Admin123!';
   const fullName = 'מנהל מערכת';
 

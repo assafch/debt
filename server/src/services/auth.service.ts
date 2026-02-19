@@ -4,7 +4,8 @@ import { prisma } from '../lib/prisma';
 import { config } from '../config';
 
 export async function login(email: string, password: string) {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
   if (!user || !user.isActive) {
     throw new Error('Invalid credentials');
   }
