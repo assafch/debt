@@ -1,11 +1,11 @@
 import { Router, Request, Response } from 'express';
-import { requireAdmin } from '../middleware/requireAdmin';
 import { triggerSync } from '../priority/sync';
 import { prisma } from '../lib/prisma';
 
 const router = Router();
 
-router.post('/trigger', requireAdmin, async (_req: Request, res: Response): Promise<void> => {
+// Auth disabled for now — no requireAdmin check
+router.post('/trigger', async (_req: Request, res: Response): Promise<void> => {
   try {
     const syncLogId = await triggerSync();
     res.json({ syncLogId });

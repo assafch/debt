@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuthStore } from '../../store/authStore';
 import { getSyncStatus, triggerSync } from '../../api/sync';
 
 function formatDate(iso?: string | null) {
@@ -12,8 +11,6 @@ function formatDate(iso?: string | null) {
 }
 
 export default function TopBar() {
-  const logout = useAuthStore((s) => s.logout);
-  const user = useAuthStore((s) => s.user);
   const queryClient = useQueryClient();
   const [syncing, setSyncing] = useState(false);
 
@@ -50,31 +47,22 @@ export default function TopBar() {
       </div>
 
       <div className="flex items-center gap-3">
-        {user?.role === 'ADMIN' && (
-          <button
-            onClick={() => syncMutation.mutate()}
-            disabled={isRunning}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isRunning ? (
-              <>
-                <span className="animate-spin">⟳</span>
-                <span>מסנכרן...</span>
-              </>
-            ) : (
-              <>
-                <span>⟳</span>
-                <span>סנכרן פריוריטי</span>
-              </>
-            )}
-          </button>
-        )}
-
         <button
-          onClick={logout}
-          className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+          onClick={() => syncMutation.mutate()}
+          disabled={isRunning}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          יציאה
+          {isRunning ? (
+            <>
+              <span className="animate-spin">⟳</span>
+              <span>מסנכרן...</span>
+            </>
+          ) : (
+            <>
+              <span>⟳</span>
+              <span>סנכרן פריוריטי</span>
+            </>
+          )}
         </button>
       </div>
     </header>
