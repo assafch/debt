@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  COLLECTOR
+}
+
+enum SyncStatus {
+  IDLE
+  RUNNING
+  SUCCESS
+  ERROR
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  role         Role     @default(COLLECTOR)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  notes Note[]
+}
+
+model Customer {
+  priorityCode   String    @id // CUSTNAME
+  name           String // CUSTDES
+  address        String? // ADDRESS + ADDRESS2 + ADDRESS3 + STATEA + ZIP
+  priorityStatus String? // STATDES
+  paymentTerms   String? // PAYDES
+  contactPerson  String? // CONTACT
+  spec1          String? // SPEC1
+  lastSyncedAt   DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  invoices Invoice[]
+}
+
+model Invoice {
+  invoiceNumber   String   @id // IVNUM
+  customerCode    String // ACCNAME
+  customer        Customer @relation(fields: [customerCode], references: [priorityCode])
+  customerName    String // ACCDES (denormalized)
+  amount          Decimal  @db.Decimal(15, 2) // SUM
+  issueDate       DateTime? // CURDATE
+  dueDate         DateTime // FNCDATE
+  paymentMethod   String? // FNCPATNAME
+  priorityStatus  String? // INVOICEFLAG
+  transactionType String? // FNCTRANS
+  kline           Int? // KLINE
+  spec1           String? // from Customer.spec1
+
+  // CRM-managed - never overwritten by sync
+  status       String   @default("לא שולם")
+  lastSyncedAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  notes Note[]
+
+  @@index([customerCode])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model Note {
+  id            String   @id @default(uuid())
+  invoiceNumber String
+  invoice       Invoice  @relation(fields: [invoiceNumber], references: [invoiceNumber])
+  authorId      String
+  author        User     @relation(fields: [authorId], references: [id])
+  content       String
+  createdAt     DateTime @default(now())
+
+  @@index([invoiceNumber])
+}
+
+model SyncLog {
+  id          String     @id @default(uuid())
+  startedAt   DateTime   @default(now())
+  finishedAt  DateTime?
+  status      SyncStatus @default(RUNNING)
+  recordsSync Int        @default(0)
+  errorMsg    String?
+}
