@@ -25,12 +25,12 @@ app.use(express.json());
 // Public routes
 app.use('/api/auth', authRoutes);
 
-// Protected routes
-app.use('/api/customers', authMiddleware, customersRoutes);
-app.use('/api/invoices', authMiddleware, invoicesRoutes);
-app.use('/api/sync', authMiddleware, syncRoutes);
-app.use('/api/users', authMiddleware, usersRoutes);
-app.use('/api/dashboard', authMiddleware, dashboardRoutes);
+// Routes (auth disabled for now)
+app.use('/api/customers', customersRoutes);
+app.use('/api/invoices', invoicesRoutes);
+app.use('/api/sync', syncRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
