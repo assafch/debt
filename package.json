@@ -7,7 +7,7 @@
     "build": "npm run build:client && npm run build:server",
     "build:client": "cd client && npm ci && npm run build",
     "build:server": "cd server && npm ci && npx prisma generate && npm run build",
-    "start": "cd server && npx prisma migrate deploy && node dist/index.js",
+    "start": "cd server && npx prisma db push && node dist/index.js",
     "db:migrate": "cd server && npx prisma migrate deploy",
     "db:seed": "cd server && npx ts-node prisma/seed.ts"
   }
